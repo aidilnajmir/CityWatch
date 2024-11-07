@@ -1,0 +1,65 @@
+/* LoginPage.css */
+
+.welcome-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  max-width: 400px;
+  margin: auto;
+  margin-top: -60px;
+}
+
+.welcome-logo {
+  margin-bottom: 8px;
+  width: 100px;
+  margin-top: -16px;
+}
+
+.citywatch-title {
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-top: -16px;
+}
+
+.welcome-title {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #6B7280;
+  margin-top: -8px;
+}
+
+.text-field-label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.checkbox-link-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 18px;
+}
+
+.or-text {
+  margin-top: 16px;
+  color: #6B7280;
+}
+
+.signin-button {
+  background-color: #6941C6;
+  color: #fff;
+  border-radius: 8px;
+  margin: 16px ;
+}
+
+.register-button {
+  background-color: #D4B3FF;
+  color: #6941C6;
+  border-radius: 8px;
+  margin-top: 8px;
+}
