@@ -21,13 +21,20 @@ import {
   AddCircle,
   ListAlt,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './Navbar.css';
 
 const Navbar = () => {
   const [openReports, setOpenReports] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleReportsClick = () => {
     setOpenReports(!openReports);
+    navigate('/all-reports');
+  };
+
+  const handleNavigateToMap = () => {
+    navigate('/map'); // Navigate to the Maps page
   };
 
   const iconStyle = { color: '#4f378a' };
@@ -47,7 +54,7 @@ const Navbar = () => {
           <Divider />
 
           {/* Map Section */}
-          <ListItemButton>
+          <ListItemButton onClick={handleNavigateToMap}>
             <ListItemIcon sx={iconStyle}>
               <Map />
             </ListItemIcon>

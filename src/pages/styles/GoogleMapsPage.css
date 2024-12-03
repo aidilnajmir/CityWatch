@@ -1,0 +1,51 @@
+.google-maps-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full-screen layout */
+}
+
+.content-wrapper {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden; /* Prevent overflow issues */
+}
+
+.navbar {
+  width: 250px; /* Sidebar width */
+  height: 100%; /* Full height */
+  background-color: #f4f4f4; /* Optional background color */
+}
+
+.map-container {
+  flex-grow: 1; /* Occupy remaining horizontal space */
+  height: 100%; /* Full height */
+}
+
+header,
+footer {
+  height: 60px; /* Adjust header/footer height as needed */
+  background-color: #fff; /* Optional background color */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); /* Optional shadow */
+}
+
+.map-button-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it appears above the map */
+}
+
+.pin-location-button {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pin-location-button:hover {
+  background-color: #357ae8;
+}
