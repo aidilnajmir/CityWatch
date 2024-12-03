@@ -74,7 +74,7 @@ const mapStyles = [
 
 const GoogleMapsPage = () => {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyD039tCXaZr-04tI78gv2H5oYC-PjLcJz8", // Replace with your API key
+//    googleMapsApiKey: "AIzaSyD039tCXaZr-04tI78gv2H5oYC-PjLcJz8",
   });
 
   const [currentLocation, setCurrentLocation] = useState(null);
