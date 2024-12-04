@@ -1,0 +1,22 @@
+.navbar {
+    width: 240px;
+    background-color: #fff;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .nested {
+    padding-left: 20px;
+  }
+  
+  .bottom-nav {
+    margin-top: auto;
+  }
+  
+  .icon {
+    color: #4f378a;
+  }
+  
