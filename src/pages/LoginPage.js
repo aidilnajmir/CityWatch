@@ -41,7 +41,7 @@ const LoginPage = () => {
 
       <Box className="checkbox-link-container">
         <FormControlLabel control={<Checkbox />} label="Remember for 30 days" />
-        <Link href="#" sx={{ fontSize: '0.875rem' }}>Forgot password</Link>
+        <Link href="/forgot-password" sx={{ fontSize: '0.875rem' }}>Forgot password</Link>
       </Box>
 
       <StyledButton text="Sign in" onClick={handleLogin} fullWidth className="signin-button" />
