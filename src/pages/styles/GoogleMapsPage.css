@@ -47,5 +47,33 @@ footer {
 }
 
 .pin-location-button:hover {
-  background-color: #357ae8;
+  background-color: #4f378a;
+}
+.map-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.pin-location-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom:4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.pin-location-button:hover {
+  transform: scale(1.1); /* Optional hover effect */
+}
+
+
+.pin-location-icon {
+  width: 40px; /* Adjust size as needed */
+  height: 40px;
 }

@@ -1,85 +1,67 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import Navbar from "../components/Navbar/Navbar"; // Sidebar Navbar
-import Header from "../components/Header"; // Optional Header
-import Footer from "../components/Footer"; // Optional Footer
+import { useCallback } from "react";
+import Navbar from "../components/Navbar/Navbar";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import "./styles/GoogleMapsPage.css";
+import mylocation from "../assets/mylocation.svg";
+import pinlocation from "../assets/pinlocation.svg";
 
 const containerStyle = {
   width: "100%",
-  height: "100%", // Occupy remaining vertical space
+  height: "100%",
 };
 
-// Custom map styles to hide unrelated features and change the theme
 const mapStyles = [
-  {
-    featureType: "poi", // Points of Interest
-    stylers: [{ visibility: "off" }], // Hide all POI
-  },
-  {
-    featureType: "transit", // Transit features
-    stylers: [{ visibility: "off" }], // Hide transit features
-  },
-  {
-    featureType: "landscape.man_made", // Man-made structures
-    stylers: [{ visibility: "off" }], // Hide man-made features
-  },
-  {
-    featureType: "road", // Roads
-    elementType: "geometry",
-    stylers: [{ color: "#f5f5f5" }], // Light gray roads
-  },
-  {
-    featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#616161" }], // Medium gray text for road names
-  },
-  {
-    featureType: "road",
-    elementType: "labels.text.stroke",
-    stylers: [{ color: "#ffffff" }], // White background for road text
-  },
-  {
-    featureType: "administrative.land_parcel",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#bdbdbd" }], // Light gray administrative labels
-  },
-  {
-    featureType: "administrative",
-    elementType: "geometry.stroke",
-    stylers: [{ color: "#dadada" }], // Subtle boundaries
-  },
-  {
-    featureType: "landscape.natural",
-    elementType: "geometry",
-    stylers: [{ color: "#e0e0e0" }], // Soft gray background for natural areas
-  },
-  {
-    featureType: "water",
-    elementType: "geometry",
-    stylers: [{ color: "#c9e7f1" }], // Light blue water
-  },
-  {
-    featureType: "water",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#929292" }], // Subtle labels for water
-  },
-  {
-    featureType: "city",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#444444" }], // Darker text for city names
-  },
+  { featureType: "poi", stylers: [{ visibility: "off" }] },
+  { featureType: "transit", stylers: [{ visibility: "off" }] },
+  { featureType: "landscape.man_made", stylers: [{ visibility: "off" }] },
+
+  // Roads - Seamless and integrated with subtle differentiation
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#ebe2f6" }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ visibility: "off" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
+  { featureType: "road", elementType: "labels.text.stroke", stylers: [{ color: "#f9f5fc" }] },
+
+  // Administrative elements - Adding soft purple tones for boundaries
+  { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#c0aacb" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#e0c4f4" }] },
+
+  // Natural landscapes - Keep a muted, polished background
+  { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#f5ebf9" }] },
+
+  // Water - Vibrant with a soft gradient effect
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#cec3f1" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
+
+  // Highways - Distinctive to stand out, softer integration
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#d5c5ed" }] },
+  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
+
+  // City labels - Prominent and clean
+  { featureType: "city", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
+
+  // Additional enhancements for a polished look
+  { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#f9f6fc" }] },
+  { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#efe6f9" }] },
 ];
 
 
+const DEFAULT_LOCATION = { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco
+
 const GoogleMapsPage = () => {
   const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
   });
 
   const [currentLocation, setCurrentLocation] = useState(null);
   const [mapRef, setMapRef] = useState(null);
-  // Function to fetch the current location
-  const fetchCurrentLocation = () => {
+  const [hasRequestedLocation, setHasRequestedLocation] = useState(
+    sessionStorage.getItem("locationPermissionGranted") === "true"
+  );
+
+  const fetchCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -89,7 +71,8 @@ const GoogleMapsPage = () => {
           };
           setCurrentLocation(location);
           if (mapRef) {
-            mapRef.panTo(location); // Recenter the map
+            mapRef.panTo(location);
+            mapRef.setZoom(18);
           }
         },
         (error) => {
@@ -99,48 +82,37 @@ const GoogleMapsPage = () => {
       );
     } else {
       alert("Geolocation is not supported by this browser.");
+      setDefaultLocation();
     }
+  }, [mapRef]);
+  
+
+  const setDefaultLocation = () => {
+    setCurrentLocation(DEFAULT_LOCATION);
   };
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error("Error fetching location:", error.message);
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              alert("Location access denied by the user.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              alert("Location information is unavailable.");
-              break;
-            case error.TIMEOUT:
-              alert("The request to get your location timed out.");
-              break;
-            default:
-              alert("An unknown error occurred while fetching your location.");
-              break;
-          }
-          setCurrentLocation({
-            lat: 37.7749, // Default to San Francisco
-            lng: -122.4194,
-          });
+    if (!hasRequestedLocation) {
+      const askForPermission = () => {
+        const userConsent = window.confirm(
+          "This site wants to access your location to display it on the map. Do you allow access?"
+        );
+        if (userConsent) {
+          sessionStorage.setItem("locationPermissionGranted", "true");
+          setHasRequestedLocation(true);
+          fetchCurrentLocation();
+        } else {
+          alert("Location access denied. Default location will be used.");
+          setDefaultLocation();
         }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-      setCurrentLocation({
-        lat: 37.7749, // Default to San Francisco
-        lng: -122.4194,
-      });
+      };
+  
+      askForPermission();
+    } else if (!currentLocation) {
+      // Fetch location automatically if permission has already been granted
+      fetchCurrentLocation();
     }
-  }, []);
+  }, [hasRequestedLocation, currentLocation, fetchCurrentLocation]);
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -148,35 +120,44 @@ const GoogleMapsPage = () => {
 
   return (
     <div className="google-maps-layout">
-      {/* Header */}
       <Header />
-
       <div className="content-wrapper">
-        {/* Sidebar Navbar */}
         <Navbar />
-
-        {/* Google Maps */}
         <div className="map-container">
           <GoogleMap
             mapContainerStyle={containerStyle}
-            center={currentLocation || { lat: 37.7749, lng: -122.4194 }}
+            center={currentLocation || DEFAULT_LOCATION}
             zoom={15}
-            options={{ styles: mapStyles }}
-            onLoad={(map) => setMapRef(map)} // Save map reference
+            options={{
+              styles: mapStyles,
+              zoomControl: false,
+              streetViewControl: false,
+              mapTypeControl: false,
+              fullscreenControl: false,
+            }}
+            onLoad={(map) => setMapRef(map)}
           >
-            {currentLocation && <Marker position={currentLocation} />}
+            {currentLocation && (
+              <Marker
+                position={currentLocation}
+                icon={{
+                  url: mylocation,
+                  scaledSize: new window.google.maps.Size(50, 50),
+                }}
+              />
+            )}
           </GoogleMap>
         </div>
-
-        {/* Button to recenter and pin the location */}
         <div className="map-button-container">
-          <button onClick={fetchCurrentLocation} className="pin-location-button">
-            Pin My Location
+          <button
+            onClick={fetchCurrentLocation}
+            className="pin-location-button"
+            aria-label="Pin My Location"
+          >
+            <img src={pinlocation} alt="Pin Location" className="pin-location-icon" />
           </button>
         </div>
       </div>
-
-      {/* Footer */}
       <Footer />
     </div>
   );
