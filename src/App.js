@@ -7,8 +7,13 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AllReportsPage from './pages/AllReportsPage';
 import MyReportsPage from './pages/MyReportsPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import CreateReportPage from './pages/CreateReportPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+
+import CreateReportPage from './pages/CreateReportPage';
+
+import UpdatePasswordPage from './pages/UpdatePasswordPage';
+
 
 const App = () => {
   
@@ -19,6 +24,7 @@ const App = () => {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/update-password" element={<UpdatePasswordPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/all-reports" element={<AllReportsPage />} />

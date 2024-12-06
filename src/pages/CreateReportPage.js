@@ -17,4 +17,5 @@ const CreateReportPage = () => {
   );
 };
 
+
 export default CreateReportPage;
