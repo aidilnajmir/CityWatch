@@ -1,12 +1,15 @@
 import React from 'react';
 import { TextField } from '@mui/material';
 
-const TextInputBox = ({ text, onClick, fullWidth }) => {
+const TextInputBox = ({ onClick, text, value, onChange, type = 'text', fullWidth }) => {
     return (
       <TextField
         onClick={onClick}
         variant="outlined"
         fullWidth={fullWidth}
+        type={type}
+        value={value} // Bind value
+        onChange={onChange} // Handle changes
         placeholder={text}
         sx={{
           backgroundColor: '#f0f0f0',

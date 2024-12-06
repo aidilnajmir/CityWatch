@@ -1,74 +1,128 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Link, MenuItem, Select } from '@mui/material';
 import StyledButton from '../components/StyledButton';
 import TextInputBox from '../components/TextInputBox';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import logo from '../assets/CityWatch.png';
 import './styles/RegisterPage.css';
 
 const RegisterPage = () => {
-  const navigate = useNavigate();
-  const [state, setState] = React.useState('');
+    const navigate = useNavigate();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [state, setState] = useState('');
+    const [zipcode, setZipcode] = useState('');
 
-  const handleStateChange = (event) => {
-    setState(event.target.value);
+    const handleSignUp = async () => {
+      if (password !== confirmPassword) {
+          alert("Passwords do not match!");
+          return;
+      }
+  
+      try {
+          const response = await axios.post(
+              'http://localhost/Citywatch/CityWatch-Backend/register.php',
+              {
+                  name,
+                  email,
+                  password,
+                  state,
+                  zipcode,
+              }
+          );
+  
+          console.log("Server Response:", response.data); // Log server response for debugging
+  
+          if (response.data.success) {
+              alert("Registration successful!");
+              navigate('/login');
+          } else {
+              alert(response.data.message);
+          }
+      } catch (error) {
+          console.error("Registration error:", error);
+          alert("An error occurred while registering. Please try again.");
+      }
   };
 
-  const handleSignUp = () => {
-    // Add sign-up logic here
-  };
+    const handleSignIn = () => {
+        navigate('/login');
+    };
 
-  const handleSignIn = () => {
-    navigate('/login');
-  };
+    return (
+        <Box className="register-page">
+            <Box component="img" src={logo} alt="CityWatch Logo" className="register-logo" />
 
-  return (
-    <Box className="register-page">
-      <Box component="img" src={logo} alt="CityWatch Logo" className="register-logo" />
+            <Typography variant="h4" className="citywatch-title">
+                CITYWATCH
+            </Typography>
 
-      <Typography variant="h4" className="citywatch-title">
-        CITYWATCH
-      </Typography>
+            <Typography variant="h5" className="register-title">
+                Get Started Now
+            </Typography>
 
-      <Typography variant="h5" className="register-title">
-        Get Started Now
-      </Typography>
+            <Typography variant="body1" className="subtitle">
+                Enter your Credentials to Create your account
+            </Typography>
 
-      <Typography variant="body1" className="subtitle">
-        Enter your Credentials to Create your account
-      </Typography>
+            <Box className="input-container">
+                <Box className="text-field-container">
+                    <Typography variant="body2" className="text-field-label">Name</Typography>
+                    <TextInputBox
+                        text="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        fullWidth
+                    />
+                </Box>
 
-      <Box className="input-container">
-        <Box className="text-field-container">
-          <Typography variant="body2" className="text-field-label">Name</Typography>
-          <TextInputBox text="Name" fullWidth />
-        </Box>
+                <Box className="text-field-container">
+                    <Typography variant="body2" className="text-field-label">Email address</Typography>
+                    <TextInputBox
+                        text="xyz@xyz.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        fullWidth
+                    />
+                </Box>
 
-        <Box className="text-field-container">
-          <Typography variant="body2" className="text-field-label">Email address</Typography>
-          <TextInputBox text="xyz@xyz.com" fullWidth />
-        </Box>
+                <Box className="text-field-container">
+                    <Typography variant="body2" className="text-field-label">Password</Typography>
+                    <TextInputBox
+                        text="Password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        fullWidth
+                    />
+                </Box>
 
-        <Box className="text-field-container">
-          <Typography variant="body2" className="text-field-label">Password</Typography>
-          <TextInputBox text="Password" type="password" fullWidth />
-        </Box>
+                <Box className="text-field-container">
+                    <Typography variant="body2" className="text-field-label">Confirm Password</Typography>
+                    <TextInputBox
+                        text="Confirm Password"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        fullWidth
+                    />
+                </Box>
 
-        <Box className="text-field-container">
-          <Typography variant="body2" className="text-field-label">Confirm Password</Typography>
-          <TextInputBox text="Password" type="password" fullWidth />
-        </Box>
-
-        <Box className="text-field-container">
-          <Typography variant="body2" className="text-field-label">State</Typography>
-          <Select
-            value={state}
-            onChange={handleStateChange}
-            displayEmpty
-            fullWidth
-            className="state-dropdown"
-          >
-            <MenuItem value="" disabled>Select your state</MenuItem>
+                <Box className="text-field-container">
+                    <Typography variant="body2" className="text-field-label">State</Typography>
+                    <Select
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        displayEmpty
+                        fullWidth
+                        className="state-dropdown"
+                    >
+                        <MenuItem value="" disabled>Select your state</MenuItem>
+                        {/* Add all states here */}
+                        <MenuItem value="" disabled>Select your state</MenuItem>
             <MenuItem value="AL">Alabama</MenuItem>
             <MenuItem value="AK">Alaska</MenuItem>
             <MenuItem value="AZ">Arizona</MenuItem>
@@ -119,22 +173,28 @@ const RegisterPage = () => {
             <MenuItem value="WV">West Virginia</MenuItem>
             <MenuItem value="WI">Wisconsin</MenuItem>
             <MenuItem value="WY">Wyoming</MenuItem>
-          </Select>
+                        {/* Add the remaining states */}
+                    </Select>
+                </Box>
+
+                <Box className="text-field-container">
+                    <Typography variant="body2" className="text-field-label">Zip Code</Typography>
+                    <TextInputBox
+                        text="Zip Code"
+                        value={zipcode}
+                        onChange={(e) => setZipcode(e.target.value)}
+                        fullWidth
+                    />
+                </Box>
+            </Box>
+
+            <StyledButton text="Sign up" onClick={handleSignUp} fullWidth className="signup-button" />
+
+            <Typography variant="body2" className="signin-link">
+                Have an account? <Link href="#" onClick={handleSignIn}>Sign In</Link>
+            </Typography>
         </Box>
-
-        <Box className="text-field-container">
-          <Typography variant="body2" className="text-field-label">Zip Code</Typography>
-          <TextInputBox text="Zip Code" fullWidth />
-        </Box>
-      </Box>
-
-      <StyledButton text="Sign up" onClick={handleSignUp} fullWidth className="signup-button" />
-
-      <Typography variant="body2" className="signin-link">
-        Have an account? <Link href="#" onClick={handleSignIn}>Sign In</Link>
-      </Typography>
-    </Box>
-  );
+    );
 };
 
 export default RegisterPage;

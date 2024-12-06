@@ -40,7 +40,6 @@ const mapStyles = [
   { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
 
   // City labels - Prominent and clean
-  { featureType: "city", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
 
   // Additional enhancements for a polished look
   { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#f9f6fc" }] },
