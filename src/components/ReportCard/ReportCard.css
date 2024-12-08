@@ -3,30 +3,58 @@
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  transition: all 0.2s ease; /* Smooth transition for hover effect */
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 340px; /* Fixed width for consistency */
+  height: 400px; /* Fixed height for consistency */
+  overflow: hidden; /* Prevent overflow of content */
 }
 
 .report-card:hover {
-  transform: scale(1.05);
+  transform: scale(1.05); /* Slightly enlarge the card on hover */
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  background-color: #f7f7f7;
+  background-color: #f7f7f7; /* Lighten background on hover */
 }
 
 .report-card img {
-  max-width: 100%;
-  height: auto;
+  width: 100%; /* Ensure the image covers the container */
+  height: 150px; /* Fixed height for images */
+  object-fit: cover; /* Maintain aspect ratio while filling the area */
   border-radius: 5px;
+  margin-bottom: 10px;
 }
 
-.report-card h3 {
-  margin: 10px 0;
+.report-header {
+  width: 100%;
+  text-align: left;
+}
+
+.report-details {
+  width: 100%;
+  flex-grow: 1;
+  text-align: left;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+.report-details h3 {
   font-size: 18px;
+  margin: 0 0 10px;
+  text-overflow: ellipsis; /* Truncate long titles with ellipsis */
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.report-card p {
+.report-details p {
+  margin: 5px 0;
   font-size: 14px;
-  color: #555;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Truncate overflow text */
+  white-space: nowrap;
 }
 
 .report-card .report-title {

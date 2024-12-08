@@ -1,17 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState for state management
 import { Box, Typography, Checkbox, FormControlLabel, Link } from '@mui/material';
 import StyledButton from '../components/StyledButton';
 import TextInputBox from '../components/TextInputBox';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/CityWatch.png';
 import './styles/LoginPage.css';
+import axios from 'axios';
 
 const LoginPage = () => {
+  const [email, setEmail] = useState(''); // State for email
+  const [password, setPassword] = useState(''); // State for password
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    navigate('/login');
+  const handleLogin = async () => {
+    console.log('Login Attempt:', { email, password });
+  
+    try {
+      const response = await axios.post('http://localhost/Citywatch/CityWatch-Backend/login.php', {
+        email: email,
+        password: password,
+      });
+  
+      console.log('Backend Response:', response.data);
+  
+      if (response.data.success && response.data.user) {
+        console.log('Login successful:', response.data);
+  
+        // Save user_id and username to localStorage
+        localStorage.setItem('user_id', response.data.user.id);
+        localStorage.setItem('username', response.data.user.name || "Guest"); // Fallback for username
+  
+        navigate('/map'); // Redirect to /map on success
+      } else {
+        console.error('Login failed:', response.data.message);
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error logging in:', error);
+      alert('An error occurred while logging in.');
+    }
   };
+  
+  
+
 
   const handleRegister = () => {
     navigate('/register');
@@ -31,12 +62,29 @@ const LoginPage = () => {
 
       <Box sx={{ width: '100%', marginTop: '16px' }}>
         <Typography variant="body2" className="text-field-label">Email</Typography>
-        <TextInputBox text="Enter your email" fullWidth />
+        <TextInputBox
+          text="Enter your email"
+          fullWidth
+          type="email"
+          value={email} // Bind to email state
+          onChange={(e) => {
+            console.log('Email updated:', e.target.value); // Debug email input
+            setEmail(e.target.value);
+        }}
+        />
       </Box>
 
       <Box sx={{ width: '100%', marginTop: '8px' }}>
         <Typography variant="body2" className="text-field-label">Password</Typography>
-        <TextInputBox text="••••••••" type="password" fullWidth />
+        <TextInputBox
+          text="••••••••"
+          type="password"
+          fullWidth
+          onChange={(e) => {
+            console.log('Password updated:', e.target.value); // Debug password input
+            setPassword(e.target.value);
+        }}
+        />
       </Box>
 
       <Box className="checkbox-link-container">
