@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+
 import Navbar from "../components/Navbar/Navbar";
 import ReportCard from "../components/ReportCard/ReportCard";
 import Pagination from "../components/Pagination/Pagination";
@@ -60,9 +59,7 @@ const AllReportsPage = () => {
 
   return (
     <div className="all-reports-layout">
-      <Header />
       <div className="content-wrapper">
-        <Navbar />
         <div className="reports-page">
           {loading ? (
             <p>Loading reports...</p>
@@ -86,7 +83,6 @@ const AllReportsPage = () => {
           )}
         </div>
       </div>
-      <Footer />
       <Modal showModal={showModal} report={selectedReport} onClose={closeModal} />
     </div>
   );

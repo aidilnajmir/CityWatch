@@ -8,6 +8,9 @@ const ReportForm = () => {
     title: "",
     description: "",
     severity: "",
+    address: "",  // New address field
+    latitude: null,
+    longitude: null,
     image: null,
   });
 
@@ -26,15 +29,50 @@ const ReportForm = () => {
     }));
   };
 
+  const geocodeAddress = async () => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          formData.address
+        )}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+
+      if (data.status === "OK") {
+        const { lat, lng } = data.results[0].geometry.location;
+        return { lat, lng };
+      } else {
+        throw new Error("Address not found");
+      }
+    } catch (error) {
+      console.error("Geocoding Error:", error.message);
+      alert("Unable to find the location. Please enter a valid address.");
+      return null;
+    }
+  };
+
   const handleSubmit = async () => {
-    const priorityMap = { Low: 1, Medium: 2, High: 3 }; // Map severity to priority
+    const priorityMap = { Low: 1, Medium: 2, High: 3 }; 
+    const userId = localStorage.getItem("user_id"); 
+
+    if (!userId) {
+      alert("User ID not found. Please log in again.");
+      return;
+    }
+
+    const coordinates = await geocodeAddress();
+    if (!coordinates) return;
+
     const formDataToSend = new FormData();
-    formDataToSend.append("user_id", 1); // Replace with actual logged-in user ID
-    formDataToSend.append("category", formData.category); // Send category name instead of ID
+    formDataToSend.append("user_id", userId);
+    formDataToSend.append("category", formData.category);
+    formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
-    formDataToSend.append("longitude", 34.0522); // Replace with actual longitude
-    formDataToSend.append("latitude", -118.2437); // Replace with actual latitude
+    formDataToSend.append("latitude", coordinates.lat);
+    formDataToSend.append("longitude", coordinates.lng);
     formDataToSend.append("priority", priorityMap[formData.severity]);
+    formDataToSend.append("address", formData.address); 
+
     if (formData.image) {
       formDataToSend.append("image", formData.image);
     }
@@ -49,8 +87,6 @@ const ReportForm = () => {
       );
 
       const result = await response.json();
-      console.log("Response from backend:", result);
-
       if (result.success) {
         alert("Report submitted successfully!");
       } else {
@@ -100,6 +136,19 @@ const ReportForm = () => {
           name="description"
           placeholder="Enter description"
           value={formData.description}
+          onChange={handleChange}
+          className="form-input"
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="address">Address</label>
+        <input
+          type="text"
+          id="address"
+          name="address"
+          placeholder="Enter physical address"
+          value={formData.address}
           onChange={handleChange}
           className="form-input"
         />

@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import { useCallback } from "react";
-import Navbar from "../components/Navbar/Navbar";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import React, { useState, useEffect, useCallback } from "react";
+import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import "./styles/MapPage.css";
 import mylocation from "../assets/mylocation.svg";
 import pinlocation from "../assets/pinlocation.svg";
+import reporicon from "../assets/reporticon.svg";
 
 const containerStyle = {
   width: "100%",
@@ -17,49 +14,25 @@ const mapStyles = [
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
   { featureType: "landscape.man_made", stylers: [{ visibility: "off" }] },
-
-  // Roads - Seamless and integrated with subtle differentiation
   { featureType: "road", elementType: "geometry", stylers: [{ color: "#ebe2f6" }] },
-  { featureType: "road", elementType: "geometry.stroke", stylers: [{ visibility: "off" }] },
   { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
-  { featureType: "road", elementType: "labels.text.stroke", stylers: [{ color: "#f9f5fc" }] },
-
-  // Administrative elements - Adding soft purple tones for boundaries
-  { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#c0aacb" }] },
-  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#e0c4f4" }] },
-
-  // Natural landscapes - Keep a muted, polished background
-  { featureType: "landscape.natural", elementType: "geometry", stylers: [{ color: "#f5ebf9" }] },
-
-  // Water - Vibrant with a soft gradient effect
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#cec3f1" }] },
-  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
-
-  // Highways - Distinctive to stand out, softer integration
   { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#d5c5ed" }] },
-  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#4f378a" }] },
-
-  // City labels - Prominent and clean
-
-  // Additional enhancements for a polished look
-  { featureType: "landscape.natural", elementType: "geometry.fill", stylers: [{ color: "#f9f6fc" }] },
-  { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#efe6f9" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#cec3f1" }] },
 ];
 
-
-const DEFAULT_LOCATION = { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco
+const DEFAULT_LOCATION = { lat: 37.7749, lng: -122.4194 };
 
 const GoogleMapsPage = () => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
   });
 
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(DEFAULT_LOCATION);
   const [mapRef, setMapRef] = useState(null);
-  const [hasRequestedLocation, setHasRequestedLocation] = useState(
-    sessionStorage.getItem("locationPermissionGranted") === "true"
-  );
+  const [reports, setReports] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null);
 
+  // Fetch Current Location or Use Default
   const fetchCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -69,49 +42,45 @@ const GoogleMapsPage = () => {
             lng: position.coords.longitude,
           };
           setCurrentLocation(location);
-          if (mapRef) {
-            mapRef.panTo(location);
-            mapRef.setZoom(18);
-          }
+          mapRef?.panTo(location);
+          mapRef?.setZoom(15);
         },
-        (error) => {
-          console.error("Error fetching location:", error.message);
-          alert("Unable to retrieve your location.");
+        () => {
+          console.error("Location access denied. Using default.");
+          setCurrentLocation(DEFAULT_LOCATION);
         }
       );
     } else {
-      alert("Geolocation is not supported by this browser.");
-      setDefaultLocation();
+      console.error("Geolocation is not supported.");
+      setCurrentLocation(DEFAULT_LOCATION);
     }
   }, [mapRef]);
-  
 
-  const setDefaultLocation = () => {
-    setCurrentLocation(DEFAULT_LOCATION);
-  };
-
+  // Fetch Reports from Backend
   useEffect(() => {
-    if (!hasRequestedLocation) {
-      const askForPermission = () => {
-        const userConsent = window.confirm(
-          "This site wants to access your location to display it on the map. Do you allow access?"
+    const fetchReports = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost/Citywatch/CityWatch-Backend/reports.php"
         );
-        if (userConsent) {
-          sessionStorage.setItem("locationPermissionGranted", "true");
-          setHasRequestedLocation(true);
-          fetchCurrentLocation();
+        const data = await response.json();
+        if (data.success && data.data) {
+          setReports(data.data);
         } else {
-          alert("Location access denied. Default location will be used.");
-          setDefaultLocation();
+          console.error("Failed to fetch reports:", data.message);
         }
-      };
-  
-      askForPermission();
-    } else if (!currentLocation) {
-      // Fetch location automatically if permission has already been granted
-      fetchCurrentLocation();
-    }
-  }, [hasRequestedLocation, currentLocation, fetchCurrentLocation]);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  // Trigger location fetch on page load
+  useEffect(() => {
+    fetchCurrentLocation();
+  }, [fetchCurrentLocation]);
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -119,14 +88,12 @@ const GoogleMapsPage = () => {
 
   return (
     <div className="google-maps-layout">
-      <Header />
       <div className="content-wrapper">
-        <Navbar />
         <div className="map-container">
           <GoogleMap
             mapContainerStyle={containerStyle}
-            center={currentLocation || DEFAULT_LOCATION}
-            zoom={15}
+            center={currentLocation}
+            zoom={8}
             options={{
               styles: mapStyles,
               zoomControl: false,
@@ -136,17 +103,57 @@ const GoogleMapsPage = () => {
             }}
             onLoad={(map) => setMapRef(map)}
           >
-            {currentLocation && (
-              <Marker
-                position={currentLocation}
-                icon={{
-                  url: mylocation,
-                  scaledSize: new window.google.maps.Size(50, 50),
-                }}
-              />
-            )}
+            {/* Current User Location Marker */}
+            <Marker
+              position={currentLocation}
+              icon={{
+                url: mylocation,
+                scaledSize: new window.google.maps.Size(50, 50),
+              }}
+            />
+
+            {/* Report Markers */}
+            {reports.map((report) => {
+              const lat = parseFloat(report.latitude);
+              const lng = parseFloat(report.longitude);
+
+              if (!isNaN(lat) && !isNaN(lng)) {
+                return (
+                  <Marker
+                    key={report.id}
+                    position={{ lat, lng }}
+                    icon={{
+                      url: reporicon,
+                      scaledSize: new window.google.maps.Size(40, 40),
+                    }}
+                    onClick={() => setSelectedReport(report)}
+                  />
+                );
+              }
+              return null;
+            })}
+
+            {/* InfoWindow for Report Details */}
+            {selectedReport && (
+  <InfoWindow
+    position={{
+      lat: parseFloat(selectedReport.latitude),
+      lng: parseFloat(selectedReport.longitude),
+    }}
+    onCloseClick={() => setSelectedReport(null)}
+  >
+    <div style={{ padding: "10px", maxWidth: "200px" }}>
+      <h3>Report Details</h3>
+      <p><strong>Category:</strong> {selectedReport.category}</p>
+      <p><strong>Description:</strong> {selectedReport.description}</p>
+      <p><strong>Date Reported:</strong> {new Date(selectedReport.date_reported).toLocaleString()}</p>
+      <p><strong>Status:</strong> {selectedReport.status}</p>
+    </div>
+  </InfoWindow>
+)}
           </GoogleMap>
         </div>
+
         <div className="map-button-container">
           <button
             onClick={fetchCurrentLocation}
@@ -157,7 +164,6 @@ const GoogleMapsPage = () => {
           </button>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -14,28 +14,34 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     console.log('Login Attempt:', { email, password });
-
+  
     try {
-        const response = await axios.post('http://localhost/Citywatch/CityWatch-Backend/login.php', {
-            email: email,
-            password: password,
-        });
-
-        console.log('Backend Response:', response.data);
-        if (response.data.success) {
-            console.log('Login successful:', response.data);
-            navigate('/map'); // Redirect to /maps on success
-
-        } else {
-            console.error('Login failed:', response.data.message);
-            alert(response.data.message);
-        }
+      const response = await axios.post('http://localhost/Citywatch/CityWatch-Backend/login.php', {
+        email: email,
+        password: password,
+      });
+  
+      console.log('Backend Response:', response.data);
+  
+      if (response.data.success && response.data.user) {
+        console.log('Login successful:', response.data);
+  
+        // Save user_id and username to localStorage
+        localStorage.setItem('user_id', response.data.user.id);
+        localStorage.setItem('username', response.data.user.name || "Guest"); // Fallback for username
+  
+        navigate('/map'); // Redirect to /map on success
+      } else {
+        console.error('Login failed:', response.data.message);
+        alert(response.data.message);
+      }
     } catch (error) {
-        console.error('Error logging in:', error);
-        alert('An error occurred while logging in.');
+      console.error('Error logging in:', error);
+      alert('An error occurred while logging in.');
     }
-};
-
+  };
+  
+  
 
 
   const handleRegister = () => {

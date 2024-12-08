@@ -1,21 +1,25 @@
 import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import ReportForm from '../components/ReportForm/ReportForm';
+import { Modal, Box } from '@mui/material';
+import ReportForm from './components/ReportForm/ReportForm';
 import './styles/CreateReportPage.css';
 
-const CreateReportPage = () => {
+const CreateReportPage = ({ showModal, onClose }) => {
   return (
-    <div className="create-report-page">
-      <Header />
-      <div className="form-container">
-        <h1>Create a New Report</h1>
+    <Modal
+      open={showModal}
+      onClose={onClose}
+      aria-labelledby="create-report-modal-title"
+      aria-describedby="create-report-modal-description"
+    >
+      <Box className="modal-container">
+        <h2 id="create-report-modal-title">Create a New Report</h2>
         <ReportForm />
-      </div>
-      <Footer />
-    </div>
+        <button className="close-button" onClick={onClose}>
+          Close
+        </button>
+      </Box>
+    </Modal>
   );
 };
-
 
 export default CreateReportPage;
