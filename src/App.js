@@ -8,6 +8,7 @@ import MyReportsPage from './pages/MyReportsPage';
 import TestAdminPage from './pages/TestAdminPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import MapPage from './pages/MapPage';
+import SettingsPage from './pages/SettingsPage';
 import Layout from './components/layout'; 
 import MobileLayout from './components/MobileLayout'; // Import Mobile Layout
 
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/map" element={<MapPage />} />
             <Route path="/all-reports" element={<AllReportsPage />} />
             <Route path="/my-reports" element={<MyReportsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/admin" element={<TestAdminPage />} />
           </Routes>
         </SelectedLayout>
