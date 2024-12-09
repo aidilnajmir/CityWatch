@@ -3,7 +3,11 @@ import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-map
 import "./styles/MapPage.css";
 import mylocation from "../assets/mylocation.svg";
 import pinlocation from "../assets/pinlocation.svg";
-import reporicon from "../assets/reporticon.svg";
+
+// Status-based Icons
+import reportedIcon from "../assets/reported.svg";
+import inProgressIcon from "../assets/inprogress.svg";
+import closedIcon from "../assets/closed.svg";
 
 const containerStyle = {
   width: "100%",
@@ -31,6 +35,20 @@ const GoogleMapsPage = () => {
   const [mapRef, setMapRef] = useState(null);
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
+
+  // Determine the correct icon based on report status
+  const getMarkerIcon = (status) => {
+    switch (status.toLowerCase()) {
+      case "reported":
+        return reportedIcon;
+      case "inprogress":
+        return inProgressIcon;
+      case "closed":
+        return closedIcon;
+      default:
+        return reportedIcon;
+    }
+  };
 
   // Fetch Current Location or Use Default
   const fetchCurrentLocation = useCallback(() => {
@@ -82,6 +100,30 @@ const GoogleMapsPage = () => {
     fetchCurrentLocation();
   }, [fetchCurrentLocation]);
 
+  // Smooth Zoom to Marker
+  const handleMarkerClick = (report) => {
+    setSelectedReport(report);
+
+    if (mapRef) {
+      mapRef.panTo({
+        lat: parseFloat(report.latitude),
+        lng: parseFloat(report.longitude),
+      });
+
+      // Smoothly zoom in on the marker
+      let zoomLevel = mapRef.getZoom();
+
+      const zoomIn = () => {
+        if (zoomLevel < 15) {
+          zoomLevel += 1;
+          mapRef.setZoom(zoomLevel);
+          setTimeout(zoomIn, 100); // Adjust this timeout for smoother/faster zoom
+        }
+      };
+      zoomIn();
+    }
+  };
+
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
@@ -102,6 +144,7 @@ const GoogleMapsPage = () => {
               fullscreenControl: false,
             }}
             onLoad={(map) => setMapRef(map)}
+            onClick={() => setSelectedReport(null)} // Close InfoWindow on map click
           >
             {/* Current User Location Marker */}
             <Marker
@@ -120,14 +163,19 @@ const GoogleMapsPage = () => {
               if (!isNaN(lat) && !isNaN(lng)) {
                 return (
                   <Marker
-                    key={report.id}
-                    position={{ lat, lng }}
-                    icon={{
-                      url: reporicon,
-                      scaledSize: new window.google.maps.Size(40, 40),
-                    }}
-                    onClick={() => setSelectedReport(report)}
-                  />
+  key={report.id}
+  position={{ lat, lng }}
+  icon={{
+    url: getMarkerIcon(report.status),
+    scaledSize: new window.google.maps.Size(40, 40),
+  }}
+  animation={
+    selectedReport?.id === report.id
+      ? window.google.maps.Animation.BOUNCE
+      : null
+  }
+  onClick={() => handleMarkerClick(report)}
+/>
                 );
               }
               return null;
@@ -135,22 +183,28 @@ const GoogleMapsPage = () => {
 
             {/* InfoWindow for Report Details */}
             {selectedReport && (
-  <InfoWindow
-    position={{
-      lat: parseFloat(selectedReport.latitude),
-      lng: parseFloat(selectedReport.longitude),
-    }}
-    onCloseClick={() => setSelectedReport(null)}
-  >
-    <div style={{ padding: "10px", maxWidth: "200px" }}>
-      <h3>Report Details</h3>
-      <p><strong>Category:</strong> {selectedReport.category}</p>
-      <p><strong>Description:</strong> {selectedReport.description}</p>
-      <p><strong>Date Reported:</strong> {new Date(selectedReport.date_reported).toLocaleString()}</p>
-      <p><strong>Status:</strong> {selectedReport.status}</p>
-    </div>
-  </InfoWindow>
-)}
+              <InfoWindow
+              position={{
+                lat: parseFloat(selectedReport.latitude) + 0.002, // Increase offset to lift InfoWindow
+                lng: parseFloat(selectedReport.longitude),
+              }}
+              onCloseClick={() => setSelectedReport(null)}
+            >
+              <div
+                style={{
+                  padding: "10px",
+                  maxWidth: "200px",
+                  textAlign: "left",
+                }}
+              >
+                <h3 style={{ marginBottom: "5px" }}>Report Details</h3>
+                <p><strong>Category:</strong> {selectedReport.category}</p>
+                <p><strong>Description:</strong> {selectedReport.description}</p>
+                <p><strong>Date Reported:</strong> {new Date(selectedReport.date_reported).toLocaleString()}</p>
+                <p><strong>Status:</strong> {selectedReport.status}</p>
+              </div>
+            </InfoWindow>
+            )}
           </GoogleMap>
         </div>
 

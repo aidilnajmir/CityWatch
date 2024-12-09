@@ -44,7 +44,7 @@ const Navbar = ({ openCreateReportModal }) => {
 
   // Close Navbar on Navigation
   const handleNavigate = (path) => {
-    setIsNavbarOpen(false); // Auto-close navbar
+    setIsNavbarOpen(false); 
     navigate(path);
   };
 
@@ -103,7 +103,7 @@ const Navbar = ({ openCreateReportModal }) => {
 
             <Divider />
 
-            <ListItemButton onClick={() => handleNavigate('/map')}>
+            <ListItemButton onClick={() => handleNavigate('/user/map')}>
               <ListItemIcon sx={iconStyle}>
                 <Map />
               </ListItemIcon>
@@ -127,14 +127,14 @@ const Navbar = ({ openCreateReportModal }) => {
                   <ListItemText primary="Create Report" />
                 </ListItemButton>
 
-                <ListItemButton onClick={() => handleNavigate('/my-reports')}>
+                <ListItemButton onClick={() => handleNavigate('/user/my-reports')}>
                   <ListItemIcon sx={iconStyle}>
                     <ListAlt />
                   </ListItemIcon>
                   <ListItemText primary="My Reports" />
                 </ListItemButton>
 
-                <ListItemButton onClick={() => handleNavigate('/all-reports')}>
+                <ListItemButton onClick={() => handleNavigate('/user/all-reports')}>
                   <ListItemIcon sx={iconStyle}>
                     <ListAlt />
                   </ListItemIcon>
@@ -143,7 +143,7 @@ const Navbar = ({ openCreateReportModal }) => {
               </List>
             </Collapse>
 
-            <ListItemButton onClick={() => handleNavigate('/statistics')}>
+            <ListItemButton onClick={() => handleNavigate('/user/statistics')}>
               <ListItemIcon sx={iconStyle}>
                 <Assessment />
               </ListItemIcon>
@@ -155,7 +155,7 @@ const Navbar = ({ openCreateReportModal }) => {
         <Box sx={{ marginTop: 'auto' }}>
           <Divider />
           <List>
-            <ListItemButton onClick={() => handleNavigate('/settings')}>
+            <ListItemButton onClick={() => handleNavigate('/user/settings')}>
               <ListItemIcon sx={iconStyle}>
                 <Settings />
               </ListItemIcon>

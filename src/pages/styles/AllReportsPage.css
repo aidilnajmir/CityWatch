@@ -1,7 +1,8 @@
 .all-reports-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  width: 100%; /* Ensure the layout spans the full width */
   overflow: hidden; /* Prevent horizontal scrolling on the main layout */
 }
 
@@ -20,7 +21,7 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
-  overflow-y: hidden; /* Enable vertical scrolling */
+  overflow-y: auto; /* Enable vertical scrolling for reports */
 }
 
 .pagination-container {
@@ -32,16 +33,19 @@
 
 .reports-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px; /* Adjust gap for more space between cards */
   margin-top: 20px;
+  width: 100%; /* Full width for the container */
+  justify-items: center; /* Center the cards horizontally */
 }
+
 /* Mobile-specific adjustments */
 @media (max-width: 768px) {
   .google-maps-layout {
     flex-direction: column;
     height: 100vh;
-    width: 100vw;
+    width: 100%;
   }
 
   .navbar {

@@ -1,54 +1,124 @@
+/* Modal Overlay */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    width: 80%;
-    max-width: 600px;
-    text-align: left;
-  }
-  
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  img {
-    max-width: 100%;
-    height: auto;
-    margin-top: 20px;
-  }
-  /* src/components/Modal/Modal.css */
-.modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1000; /* Ensure it's above all elements */
+  pointer-events: all; /* Block interactions with elements behind the modal */
 }
 
-button {
-  margin: 10px 5px;
+.modal-content {
+  background: white;
+  padding: 1rem;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+  max-height: 80vh; /* Limit height */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+}
+
+.modal-body {
+  margin-bottom: 1rem; /* Add spacing at the bottom of modal body */
+}
+
+.update-status-btn {
+  margin-top: 1rem;
+  width: 100%; /* Make the button full-width if needed */
+  text-align: center;
+}
+
+
+/* Navbar Fix - Ensure it is affected by the overlay */
+.navbar {
+  position: relative; /* Ensures the navbar is affected by the overlay */
+  z-index: 0; /* Lower than the modal overlay */
+}
+
+/* Modal Close Button */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #f44336; /* Red button for clarity */
+  color: white;
+  font-size: 1.5rem;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 50%; /* Circular button */
+  transition: background 0.3s ease;
+  z-index: 1101; /* Ensure it's above the modal content */
+}
+
+.close-btn:hover {
+  background: #d32f2f;
+}
+
+/* Modal Title */
+.modal-title {
+  font-size: 2rem; /* Larger font size for emphasis */
+  margin-bottom: 1.5rem;
+  color: #4f378a; /* Rich purple title for consistency */
+}
+
+/* Modal Body */
+.modal-body p {
+  font-size: 1.2rem; /* Slightly larger text for readability */
+  margin: 1rem 0; /* Space between paragraphs */
+  color: #555; /* Subtle gray for body text */
+}
+
+.modal-body strong {
+  color: #4f378a; /* Highlight important text */
+}
+
+/* Image Container */
+.image-container {
+  text-align: center;
+  margin-top: 2rem; /* Adjust spacing above the image */
+}
+
+.report-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 15px; /* Match the card’s image styling */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Animation for Modal Appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Adjustments for Small Screens */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%; /* Slightly smaller width for mobile */
+    padding: 1.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.5rem; /* Slightly smaller title */
+  }
+
+  .modal-body p {
+    font-size: 1rem; /* Adjust font size for readability */
+  }
 }

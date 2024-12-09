@@ -13,7 +13,7 @@ const ReportCard = ({ report }) => {
     <div className="report-card">
       <div className="report-header">
         <p><strong>User:</strong> {report.username || "N/A"}</p>
-        <p><strong>Location:</strong> {report.location || "N/A"}</p>
+        <p><strong>Location:</strong> {report.phyaddress || "N/A"}</p>
         <p><strong>Category:</strong> {report.category || "N/A"}</p>
       </div>
       <img

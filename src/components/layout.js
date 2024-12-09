@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom'; // To get the current route
+import { useLocation, Outlet } from 'react-router-dom'; // Use Outlet for route rendering
 import Navbar from './Navbar/Navbar';
 import Header from './Header';
 import Footer from './Footer';
-import CreateReportModal from './Modal/CreateReportModal'; // Import the modal component
+import CreateReportModal from './Modal/CreateReportModal'; 
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const [showCreateReportModal, setShowCreateReportModal] = useState(false);
-  const location = useLocation(); // Get the current route
+  const location = useLocation(); 
 
   const openCreateReportModal = () => setShowCreateReportModal(true);
   const closeCreateReportModal = () => setShowCreateReportModal(false);
@@ -16,25 +16,28 @@ const Layout = ({ children }) => {
 
   // Define overflow behavior based on the route
   const getContentStyle = () => {
-    if (location.pathname === '/map') {
-      return { flex: 1, overflow: 'hidden', padding: '0' }; // No scrollbars for the map
+    if (location.pathname === '/user/map') {
+      return { flex: 1, overflow: 'hidden', padding: '0' }; 
     }
-    return { flex: 1, overflowY: 'auto', padding: '20px' }; // Scrollbars for other pages
+    return { flex: 1, overflowY: 'auto', padding: '20px' }; 
   };
 
   return (
     <div className="app-layout" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <Header  style={{ backgroundColor: '#6941C6', color: '#fff', padding: '1rem' }} />
+      <Header style={{ backgroundColor: '#6941C6', color: '#fff', padding: '1rem' }} />
+      
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-      {!shouldHideNavbar && (
+        {!shouldHideNavbar && (
           <Navbar openCreateReportModal={openCreateReportModal} /> 
-        )}        <div style={getContentStyle()}>
-          {children}
+        )}
+        <div style={getContentStyle()}>
+          {/* Render the active route's component */}
+          <Outlet />
         </div>
       </div>
+      
       <Footer />
 
-      {/* Render the Create Report Modal */}
       {showCreateReportModal && (
         <CreateReportModal onClose={closeCreateReportModal} />
       )}

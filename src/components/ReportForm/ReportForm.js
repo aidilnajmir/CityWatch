@@ -71,7 +71,7 @@ const ReportForm = () => {
     formDataToSend.append("latitude", coordinates.lat);
     formDataToSend.append("longitude", coordinates.lng);
     formDataToSend.append("priority", priorityMap[formData.severity]);
-    formDataToSend.append("address", formData.address); 
+    formDataToSend.append("phyaddress", formData.address);  // Correct field name
 
     if (formData.image) {
       formDataToSend.append("image", formData.image);
@@ -110,9 +110,11 @@ const ReportForm = () => {
           className="form-input"
         >
           <option value="">Select a category</option>
-          <option value="Road Issue">Road Issue</option>
-          <option value="Lighting">Lighting</option>
-          <option value="Garbage">Garbage</option>
+          <option value="Infrastructure Issues">Infrastructure Issues"</option>
+          <option value="Sanitation & Waste Management">Waste Management</option>
+          <option value="Environmental Concerns">Environmental Concerns</option>
+          <option value="Public Safety">Public Safety</option>
+          <option value="Utility Services">Utility Services</option>
         </select>
       </div>
 
