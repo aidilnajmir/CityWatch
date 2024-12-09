@@ -143,7 +143,7 @@ const Navbar = ({ openCreateReportModal }) => {
               </List>
             </Collapse>
 
-            <ListItemButton onClick={() => handleNavigate('/user/statistics')}>
+            <ListItemButton onClick={() => handleNavigate('/user/stats')}>
               <ListItemIcon sx={iconStyle}>
                 <Assessment />
               </ListItemIcon>

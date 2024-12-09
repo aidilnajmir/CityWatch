@@ -6,7 +6,8 @@ import WelcomePage from './pages/WelcomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import AdminManagementPage from './pages/usermanagment'
+import AdminManagementPage from './pages/usermanagment';
+
 // User Pages
 import MapPage from './pages/MapPage';
 import AllReportsPage from './pages/AllReportsPage';
@@ -16,6 +17,7 @@ import MyReportsPage from './pages/MyReportsPage';
 import Layout from './components/layout';
 import MobileLayout from './components/MobileLayout';
 import AdminLayout from './components/AdminLayout';
+import StatisticsPage from './pages/stats';
 
 const App = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -45,7 +47,7 @@ const App = () => {
             <Route path="all-reports" element={<AllReportsPage />} />
             <Route path="my-reports" element={<MyReportsPage />} />
             <Route path="user-info" element={<AdminManagementPage />} />
-
+            <Route path="stats" element={<StatisticsPage />} />
           </Route>
 
           {/* User Routes */}
@@ -56,6 +58,8 @@ const App = () => {
             <Route path="map" element={<MapPage />} />
             <Route path="all-reports" element={<AllReportsPage />} />
             <Route path="my-reports" element={<MyReportsPage />} />
+            <Route path="stats" element={<StatisticsPage />} />
+
           </Route>
         </Routes>
       </div>
