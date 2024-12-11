@@ -29,7 +29,7 @@ const App = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  //const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   return (
     <Router>
