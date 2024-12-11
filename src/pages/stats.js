@@ -6,6 +6,10 @@ import {
   CardContent,
   CircularProgress,
   Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import axios from 'axios';
 import Chart from 'react-apexcharts';
@@ -13,13 +17,16 @@ import Chart from 'react-apexcharts';
 const StatisticsPage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('category'); // Default filter is 'category'
 
+  // Fetch statistics based on the selected filter
   useEffect(() => {
     const fetchStatistics = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
           'http://localhost/Citywatch/CityWatch-Backend/stats.php',
-          { params: { action: 'getStatistics' } }
+          { params: { action: 'getStatistics', filter } }
         );
         if (response.data.success) {
           setStats(response.data.statistics);
@@ -31,7 +38,7 @@ const StatisticsPage = () => {
       }
     };
     fetchStatistics();
-  }, []);
+  }, [filter]);
 
   if (loading)
     return (
@@ -57,9 +64,24 @@ const StatisticsPage = () => {
         City Report Statistics
       </Typography>
 
+      {/* Filter Dropdown */}
+      <FormControl sx={{ minWidth: 200, marginBottom: 4 }}>
+        <InputLabel id="filter-label"></InputLabel>
+        <Select
+          labelId="filter-label"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
+          <MenuItem value="category">Category</MenuItem>
+          <MenuItem value="status">Status</MenuItem>
+          <MenuItem value="zipcode">Zipcode</MenuItem>
+        </Select>
+      </FormControl>
+
+      {/* Statistics Grid */}
       <Grid container spacing={3}>
-        {/* Total Reports by Status */}
-        <Grid item xs={12} md={4}>
+        {/* Statistics Summary */}
+        <Grid item xs={12}>
           <Card
             sx={{
               backgroundColor: '#f4e6ff',
@@ -72,59 +94,11 @@ const StatisticsPage = () => {
                 variant="h6"
                 sx={{ fontWeight: 'bold', marginBottom: 2 }}
               >
-                Total Reports by Status
+                Total Reports by {filter.charAt(0).toUpperCase() + filter.slice(1)}
               </Typography>
-              {stats.reportsByStatus.map((status) => (
-                <Typography key={status.status} sx={{ color: '#6941C6' }}>
-                  {status.status}: {status.total}
-                </Typography>
-              ))}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Average Time to Close */}
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              backgroundColor: '#e8f5e9',
-              boxShadow: 3,
-              borderRadius: 4,
-            }}
-          >
-            <CardContent>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 'bold', marginBottom: 2 }}
-              >
-                Average Time to Close
-              </Typography>
-              <Typography sx={{ color: '#388e3c' }}>
-                {stats.avgTimeToClose.avg_days_to_close || 'N/A'} Days
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Top Report Categories */}
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              backgroundColor: '#e3f2fd',
-              boxShadow: 3,
-              borderRadius: 4,
-            }}
-          >
-            <CardContent>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 'bold', marginBottom: 2 }}
-              >
-                Top Report Categories
-              </Typography>
-              {stats.topCategories.map((category) => (
-                <Typography key={category.category} sx={{ color: '#1976d2' }}>
-                  {category.category}: {category.report_count}
+              {stats.map((stat) => (
+                <Typography key={stat.name} sx={{ color: '#6941C6' }}>
+                  {stat.name}: {stat.total}
                 </Typography>
               ))}
             </CardContent>
@@ -132,121 +106,117 @@ const StatisticsPage = () => {
         </Grid>
       </Grid>
 
-      {/* Monthly Report Submissions */}
+      {/* Graph */}
       <Box sx={{ marginTop: 6 }}>
-  <Typography
-    variant="h6"
-    sx={{ fontWeight: 'bold', marginBottom: 2, color: '#4f378a' }}
-  >
-    Monthly Report Submissions
-  </Typography>
-  <Chart
-    options={{
-      chart: {
-        id: 'monthlyReports',
-        type: 'bar',
-        animations: {
-          enabled: true,
-          easing: 'easeinout',
-          speed: 800,
-        },
-        toolbar: {
-          show: true,
-          tools: {
-            download: true,
-            zoom: true,
-            pan: true,
-          },
-        },
-      },
-      plotOptions: {
-        bar: {
-          borderRadius: 8,
-          horizontal: false,
-          columnWidth: '60%',
-        },
-      },
-      colors: ['#6941C6'],
-      dataLabels: {
-        enabled: true,
-        style: {
-          colors: ['#fff'],
-        },
-      },
-      fill: {
-        opacity: 0.85,
-        type: 'gradient',
-        gradient: {
-          shade: 'dark',
-          type: 'vertical',
-          shadeIntensity: 0.4,
-          gradientToColors: ['#9c27b0'],
-          inverseColors: true,
-          opacityFrom: 0.85,
-          opacityTo: 0.55,
-          stops: [0, 100],
-        },
-      },
-      xaxis: {
-        categories: stats.monthlyReports.map((m) => m.month),
-        title: {
-          text: 'Months',
-          style: {
-            color: '#4f378a',
-            fontSize: '14px',
-            fontWeight: 'bold',
-          },
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Reports Submitted',
-          style: {
-            color: '#4f378a',
-            fontSize: '14px',
-            fontWeight: 'bold',
-          },
-        },
-      },
-      tooltip: {
-        theme: 'dark',
-        x: {
-          format: 'MM/yyyy',
-        },
-        y: {
-          formatter: (val) => `${val} Reports`,
-        },
-      },
-      legend: {
-        show: true,
-        position: 'top',
-        horizontalAlign: 'right',
-        markers: {
-          width: 12,
-          height: 12,
-          strokeWidth: 0,
-          radius: 12,
-        },
-      },
-      grid: {
-        borderColor: '#e7e7e7',
-        row: {
-          colors: ['#f8f8f8', 'transparent'], // Alternate rows color
-          opacity: 0.5,
-        },
-      },
-    }}
-    series={[
-      {
-        name: 'Reports',
-        data: stats.monthlyReports.map((m) => m.report_count),
-      },
-    ]}
-    type="bar"
-    height={350}
-  />
-</Box>
-
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 'bold', marginBottom: 2, color: '#4f378a' }}
+        >
+          Reports by {filter.charAt(0).toUpperCase() + filter.slice(1)}
+        </Typography>
+        <Chart
+          options={{
+            chart: {
+              id: 'reportsByFilter',
+              type: 'bar',
+              animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800,
+              },
+              toolbar: {
+                show: true,
+                tools: {
+                  download: true,
+                  zoom: true,
+                  pan: true,
+                },
+              },
+            },
+            plotOptions: {
+              bar: {
+                borderRadius: 8,
+                horizontal: false,
+                columnWidth: '60%',
+              },
+            },
+            colors: ['#6941C6'],
+            dataLabels: {
+              enabled: true,
+              style: {
+                colors: ['#fff'],
+              },
+            },
+            fill: {
+              opacity: 0.85,
+              type: 'gradient',
+              gradient: {
+                shade: 'dark',
+                type: 'vertical',
+                shadeIntensity: 0.4,
+                gradientToColors: ['#9c27b0'],
+                inverseColors: true,
+                opacityFrom: 0.85,
+                opacityTo: 0.55,
+                stops: [0, 100],
+              },
+            },
+            xaxis: {
+              categories: stats.map((stat) => stat.name),
+              title: {
+                text: filter.charAt(0).toUpperCase() + filter.slice(1),
+                style: {
+                  color: '#4f378a',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                },
+              },
+            },
+            yaxis: {
+              title: {
+                text: 'Reports Submitted',
+                style: {
+                  color: '#4f378a',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                },
+              },
+            },
+            tooltip: {
+              theme: 'dark',
+              y: {
+                formatter: (val) => `${val} Reports`,
+              },
+            },
+            legend: {
+              show: true,
+              position: 'top',
+              horizontalAlign: 'right',
+              markers: {
+                width: 12,
+                height: 12,
+                strokeWidth: 0,
+                radius: 12,
+              },
+            },
+            grid: {
+              borderColor: '#e7e7e7',
+              row: {
+                colors: ['#f8f8f8', 'transparent'], // Alternate rows color
+                opacity: 0.5,
+              },
+            },
+          }}
+          series={[
+            {
+              name: 'Reports',
+              data: stats.map((stat) => stat.total),
+            },
+          ]}
+          type="bar"
+          height={350}
+        />
+      </Box>
     </Box>
   );
 };
