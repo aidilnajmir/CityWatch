@@ -1,17 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Box, TextField, Select, MenuItem, Typography } from '@mui/material';
 import StyledButton from '../components/StyledButton';
 import EditPasswordPopup from '../components/EditPasswordPopup';
 import './styles/SettingsPage.css';
 
+
+const US_STATES = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", 
+  "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", 
+  "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", 
+  "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", 
+  "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+  "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+];
+
 const SettingsPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [state, setState] = useState('');
+  const [state, setState] = useState('');const [password, setPassword] = useState(''); 
   const [zipcode, setZipcode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [editField, setEditField] = useState(null);
   const [passwordPopupOpen, setPasswordPopupOpen] = useState(false);
+
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const id = localStorage.getItem('id');
+        console.log(id);
+        const response = await axios.get('http://localhost/Citywatch/CityWatch-Backend/get_user_data.php?user_id=' + id, {
+          withCredentials: true,  // Important if you're using cookies/session for authentication
+        });
+
+        const userSettings = response.data;
+
+        if (userSettings.success) {
+          setName(userSettings.user.name || '');
+          setEmail(userSettings.user.email || '');
+          setState(userSettings.address.state_name || '');
+          setZipcode(userSettings.address.zipcode || '');
+          setPhoneNumber(userSettings.user.phone_number || '');  // Assuming phone number is included in user data
+        } else {
+          console.error('Error fetching user data:', userSettings.message);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleOpenPasswordPopup = () => {
     setPasswordPopupOpen(true);
@@ -25,11 +66,51 @@ const SettingsPage = () => {
     setEditField(field);
   };
 
-  const handleSave = () => {
-    alert(`${editField} updated successfully!`);
-    setEditField(null);
+  const handleSave = async (field) => {
+    try {
+      const id = localStorage.getItem('id'); // Assuming user ID is stored in localStorage
+      const data = {};
+  
+      switch (field) {
+        case 'name':
+          data.name = name;
+          break;
+        case 'email':
+          data.email = email;
+          break;
+        case 'state':
+          data.state = state;
+          break;
+        case 'zipcode':
+          data.zipcode = zipcode;
+          break;
+        case 'password':
+          data.password = password; // New password field
+          break;
+        default:
+          break;
+      }
+  
+      // Construct the URL for the POST request
+      const url = 'http://localhost/Citywatch/CityWatch-Backend/update_user_data.php';
+  
+      // Add user_id to the data object
+      data.user_id = id;
+  
+      // Send POST request with data in the body
+      const response = await axios.post(url, data);
+  
+      if (response.data.success) {
+        alert(`${field} updated successfully!`);
+        setEditField(null); // Reset field edit state
+      } else {
+        alert(`Failed to update ${field}`);
+      }
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      alert('There was an error updating your information.');
+    }
   };
-
   return (
     <div className="settings-page">
       <div className="content">
@@ -51,7 +132,7 @@ const SettingsPage = () => {
             )}
             <StyledButton
               text={editField === 'name' ? 'Save' : 'Edit'}
-              onClick={editField === 'name' ? handleSave : () => handleEditField('name')}
+              onClick={editField === 'name' ? () => handleSave('name') : () => handleEditField('name')}
               className="edit-button"
             />
           </Box>
@@ -72,83 +153,39 @@ const SettingsPage = () => {
             )}
             <StyledButton
               text={editField === 'email' ? 'Save' : 'Edit'}
-              onClick={editField === 'email' ? handleSave : () => handleEditField('email')}
+              onClick={editField === 'email' ? () => handleSave('email') : () => handleEditField('email')}
               className="edit-button"
             />
           </Box>
 
           {/* Editable State */}
           <Box className="form-group">
-            <Typography className="field-label">State</Typography>
-            {editField === 'state' ? (
-              <Select
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                displayEmpty
-                className="form-field"
-                size="small"
-              >
-                <MenuItem value="" disabled>Select your state</MenuItem>
-                <MenuItem value="AL">Alabama</MenuItem>
-                <MenuItem value="AK">Alaska</MenuItem>
-                <MenuItem value="AZ">Arizona</MenuItem>
-                <MenuItem value="AR">Arkansas</MenuItem>
-                <MenuItem value="CA">California</MenuItem>
-                <MenuItem value="CO">Colorado</MenuItem>
-                <MenuItem value="CT">Connecticut</MenuItem>
-                <MenuItem value="DE">Delaware</MenuItem>
-                <MenuItem value="FL">Florida</MenuItem>
-                <MenuItem value="GA">Georgia</MenuItem>
-                <MenuItem value="HI">Hawaii</MenuItem>
-                <MenuItem value="ID">Idaho</MenuItem>
-                <MenuItem value="IL">Illinois</MenuItem>
-                <MenuItem value="IN">Indiana</MenuItem>
-                <MenuItem value="IA">Iowa</MenuItem>
-                <MenuItem value="KS">Kansas</MenuItem>
-                <MenuItem value="KY">Kentucky</MenuItem>
-                <MenuItem value="LA">Louisiana</MenuItem>
-                <MenuItem value="ME">Maine</MenuItem>
-                <MenuItem value="MD">Maryland</MenuItem>
-                <MenuItem value="MA">Massachusetts</MenuItem>
-                <MenuItem value="MI">Michigan</MenuItem>
-                <MenuItem value="MN">Minnesota</MenuItem>
-                <MenuItem value="MS">Mississippi</MenuItem>
-                <MenuItem value="MO">Missouri</MenuItem>
-                <MenuItem value="MT">Montana</MenuItem>
-                <MenuItem value="NE">Nebraska</MenuItem>
-                <MenuItem value="NV">Nevada</MenuItem>
-                <MenuItem value="NH">New Hampshire</MenuItem>
-                <MenuItem value="NJ">New Jersey</MenuItem>
-                <MenuItem value="NM">New Mexico</MenuItem>
-                <MenuItem value="NY">New York</MenuItem>
-                <MenuItem value="NC">North Carolina</MenuItem>
-                <MenuItem value="ND">North Dakota</MenuItem>
-                <MenuItem value="OH">Ohio</MenuItem>
-                <MenuItem value="OK">Oklahoma</MenuItem>
-                <MenuItem value="OR">Oregon</MenuItem>
-                <MenuItem value="PA">Pennsylvania</MenuItem>
-                <MenuItem value="RI">Rhode Island</MenuItem>
-                <MenuItem value="SC">South Carolina</MenuItem>
-                <MenuItem value="SD">South Dakota</MenuItem>
-                <MenuItem value="TN">Tennessee</MenuItem>
-                <MenuItem value="TX">Texas</MenuItem>
-                <MenuItem value="UT">Utah</MenuItem>
-                <MenuItem value="VT">Vermont</MenuItem>
-                <MenuItem value="VA">Virginia</MenuItem>
-                <MenuItem value="WA">Washington</MenuItem>
-                <MenuItem value="WV">West Virginia</MenuItem>
-                <MenuItem value="WI">Wisconsin</MenuItem>
-                <MenuItem value="WY">Wyoming</MenuItem>
-              </Select>
-            ) : (
-              <Typography className="field-text">{state || 'Not set'}</Typography>
-            )}
-            <StyledButton
-              text={editField === 'state' ? 'Save' : 'Edit'}
-              onClick={editField === 'state' ? handleSave : () => handleEditField('state')}
-              className="edit-button"
-            />
-          </Box>
+      <Typography className="field-label">State</Typography>
+      {editField === 'state' ? (
+        <Select
+          value={state}
+          onChange={(e) => setState(e.target.value)}
+          displayEmpty
+          className="form-field"
+          size="small"
+        >
+          <MenuItem value="" disabled>Select your state</MenuItem>
+          {/* Map through the states and create MenuItem for each */}
+          {US_STATES.map((stateName) => (
+            <MenuItem key={stateName} value={stateName}>
+              {stateName}
+            </MenuItem>
+          ))}
+        </Select>
+      ) : (
+        <Typography className="field-text">{state || 'Not set'}</Typography>
+      )}
+      <StyledButton
+        text={editField === 'state' ? 'Save' : 'Edit'}
+        onClick={editField === 'state' ? () => handleSave('state') : () => handleEditField('state')}
+        className="edit-button"
+      />
+    </Box>
 
           {/* Editable Zip Code */}
           <Box className="form-group">
@@ -166,7 +203,7 @@ const SettingsPage = () => {
             )}
             <StyledButton
               text={editField === 'zipcode' ? 'Save' : 'Edit'}
-              onClick={editField === 'zipcode' ? handleSave : () => handleEditField('zipcode')}
+              onClick={editField === 'zipcode' ? () => handleSave('zipcode') : () => handleEditField('zipcode')}
               className="edit-button"
             />
           </Box>
@@ -187,23 +224,40 @@ const SettingsPage = () => {
             )}
             <StyledButton
               text={editField === 'phoneNumber' ? 'Save' : 'Edit'}
-              onClick={editField === 'phoneNumber' ? handleSave : () => handleEditField('phoneNumber')}
+              onClick={editField === 'phoneNumber' ? () => handleSave('phoneNumber') : () => handleEditField('phoneNumber')}
               className="edit-button"
             />
           </Box>
+
+
+
+          <Box className="form-group">
+  <Typography className="field-label">Change Password</Typography>
+  {editField === 'password' ? (
+    <TextField
+      type="password" // Set input type to 'password' to hide the characters
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      placeholder="Enter your new password"
+      className="form-field"
+      size="small"
+    />
+  ) : (
+    <Typography className="field-text">**********</Typography> // Mask the password value when not editing
+  )}
+  <StyledButton
+    text={editField === 'password' ? 'Save' : 'Edit'}
+    onClick={editField === 'password' ? () => handleSave('password') : () => handleEditField('password')}
+    className="edit-button"
+  />
+</Box>
         </Box>
 
-        <Box className="change-password-container">
-          <StyledButton
-            text="Change Password"
-            onClick={handleOpenPasswordPopup}
-            className="change-password-button"
-          />
-        </Box>
-        <EditPasswordPopup
-          open={passwordPopupOpen}
-          onClose={handleClosePasswordPopup}
-        />
+
+
+        
+
+       
       </div>
     </div>
   );

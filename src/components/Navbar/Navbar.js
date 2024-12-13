@@ -45,6 +45,10 @@ const Navbar = ({ openCreateReportModal }) => {
   // Close Navbar on Navigation
   const handleNavigate = (path) => {
     setIsNavbarOpen(false); 
+    localStorage.removeItem('user_id');
+  localStorage.removeItem('username');
+  localStorage.removeItem('usertype');
+  localStorage.removeItem('password')
     navigate(path);
   };
 
@@ -162,7 +166,7 @@ const Navbar = ({ openCreateReportModal }) => {
               <ListItemText primary="Settings" />
             </ListItemButton>
 
-            <ListItemButton onClick={() => handleNavigate('/logout')}>
+            <ListItemButton onClick={() => handleNavigate('/')}>
               <ListItemIcon sx={iconStyle}>
                 <Logout />
               </ListItemIcon>
